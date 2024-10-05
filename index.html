@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta tag `viewport` zapewnia, że aplikacja będzie dobrze wyglądać na różnych urządzeniach mobilnych, dostosowując skalowanie strony. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2b2b2b">
+    <!-- Plik manifestu umożliwia przekształcenie aplikacji w Progressive Web App (PWA), dzięki czemu może być instalowana na urządzeniach mobilnych. -->
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>To-Do List App</title>
+</head>
+<body>
+    <header>
+        <h1>My To-Do List</h1>
+        <nav>
+            <button id="nav-home">Home</button>
+            <button id="nav-tasks">Tasks</button>
+            <button id="nav-voice-notes">Voice Notes</button>
+        </nav>
+    </header>
+    <main>
+        <section id="home-view" class="view">
+            <h2>Welcome to the To-Do List App</h2>
+            <p>Manage your tasks and voice notes efficiently.</p>
+        </section>
+        <section id="tasks-view" class="view hidden">
+            <!-- Widok zadań, w którym użytkownik może dodawać nowe zadania do listy. Początkowo ten widok jest ukryty. -->
+            <h2>Tasks</h2>
+            <section class="todo-list">
+                <ul id="task-list">
+                    <!-- Tasks will be added dynamically here -->
+                </ul>
+            </section>
+            <section class="add-task">
+                <input type="text" id="task-input" placeholder="Enter a new task">
+                <button id="add-task-button">Add Task</button>
+                <button id="add-voice-note-button">Add Voice Note</button>
+            </section>
+        </section>
+        <section id="voice-notes-view" class="view hidden">
+            <!-- Widok notatek głosowych, w którym użytkownik może zarządzać notatkami głosowymi. Ten widok również jest początkowo ukryty. -->
+            <h2>Voice Notes</h2>
+            <section class="voice-notes">
+                <ul id="voice-note-list">
+                    <!-- Voice notes will be added dynamically here -->
+                </ul>
+            </section>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 To-Do List App</p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+</html>
