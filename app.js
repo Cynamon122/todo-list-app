@@ -231,18 +231,33 @@ document.addEventListener('DOMContentLoaded', () => {
     startRecordingButton.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mpeg' });
+                let mimeType = 'audio/webm';
+    
+                // Sprawdź, czy obsługiwany jest kodek opus
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    mimeType = 'audio/webm;codecs=opus';
+                } else if (MediaRecorder.isTypeSupported('audio/mpeg')) {
+                    mimeType = 'audio/mpeg'; // Dodane wsparcie dla mpeg
+                }
+    
+                // Utwórz MediaRecorder z odpowiednim MIME
+                mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
                 audioChunks = [];
     
                 mediaRecorder.start();
-                console.log('Recording started');
+                console.log('Recording started with MIME type:', mimeType);
     
                 // Pokazanie napisu "Recording..."
                 recordingIndicator.textContent = "Recording...";
                 recordingIndicator.classList.remove('hidden');
     
                 mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                        console.log('Audio chunk received:', event.data);
+                    } else {
+                        console.warn('Received empty audio chunk.');
+                    }
                 };
     
                 startRecordingButton.classList.add('hidden');
@@ -253,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
     
+    
 
     // Zatrzymanie nagrywania
     stopRecordingButton.addEventListener('click', () => {
@@ -260,12 +276,15 @@ document.addEventListener('DOMContentLoaded', () => {
             mediaRecorder.stop();
     
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                const mimeType = mediaRecorder.mimeType || 'audio/webm'; // Pobierz użyty MIME
+                const audioBlob = new Blob(audioChunks, { type: mimeType });
+                console.log('Generated audio Blob:', audioBlob);
+    
                 addVoiceNote(audioBlob).then(noteId => {
                     const audioUrl = URL.createObjectURL(audioBlob);
-                    displayVoiceNote({ id: noteId, audioUrl }); // Natychmiastowe wyświetlenie nowej notatki
+                    displayVoiceNote({ id: noteId, audioUrl });
                 }).catch(error => {
-                    console.error("Błąd podczas dodawania notatki głosowej:", error);
+                    console.error('Błąd podczas zapisu notatki głosowej:', error);
                 });
     
                 recordingIndicator.textContent = "";
@@ -275,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     });
+    
 
     // Funkcja wyświetlania notatki głosowej w interfejsie użytkownika
     function displayVoiceNote(note) {
@@ -282,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         const audio = document.createElement('audio');
         audio.controls = true;
-        audio.src = URL.createObjectURL(note.content);
+        audio.src = note.audioUrl;
     
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
