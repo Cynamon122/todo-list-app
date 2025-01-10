@@ -56,21 +56,27 @@ function deleteTask(id) {
             const request = store.delete(id);
 
             request.onsuccess = () => resolve();
-            request.onerror = (event) => reject(event.target.error);
+            request.onerror = event => reject(event.target.error);
         });
     });
 }
 
-// Funkcja dodająca nową notatkę głosową do IndexedDB
-function addVoiceNote(note) {
+// Funkcja dodająca notatkę głosową do IndexedDB
+function addVoiceNote(audioBlob) {
     return openDatabase().then(db => {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction("voiceNotes", "readwrite");
             const store = transaction.objectStore("voiceNotes");
-            const request = store.add({ content: note });
+            const request = store.add({ content: audioBlob });
 
-            request.onsuccess = () => resolve();
-            request.onerror = (event) => reject(event.target.error);
+            request.onsuccess = (event) => {
+                console.log('Notatka głosowa dodana do IndexedDB:', event.target.result); // Debug
+                resolve(event.target.result); // Zwróć ID dodanej notatki
+            };
+            request.onerror = (event) => {
+                console.error("Błąd podczas dodawania notatki głosowej:", event.target.error); // Debug
+                reject(event.target.error);
+            };
         });
     });
 }
@@ -83,7 +89,14 @@ function getVoiceNotes() {
             const store = transaction.objectStore("voiceNotes");
             const request = store.getAll();
 
-            request.onsuccess = (event) => resolve(event.target.result);
+            request.onsuccess = (event) => {
+                const notes = event.target.result.map(note => {
+                    const audioUrl = URL.createObjectURL(note.content);
+                    return { id: note.id, audioUrl: audioUrl };
+                });
+                resolve(notes);
+            };
+
             request.onerror = (event) => reject(event.target.error);
         });
     });
@@ -98,7 +111,7 @@ function deleteVoiceNote(id) {
             const request = store.delete(id);
 
             request.onsuccess = () => resolve();
-            request.onerror = (event) => reject(event.target.error);
+            request.onerror = event => reject(event.target.error);
         });
     });
 }
@@ -167,18 +180,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayTask(task) {
         const listItem = document.createElement('li');
         listItem.textContent = task.content;
-        
+    
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
         deleteButton.addEventListener('click', () => {
             deleteTask(task.id).then(() => {
-                taskList.removeChild(listItem);
+                listItem.remove(); // Usuń zadanie z DOM
+                console.log(`Zadanie ${task.id} zostało usunięte.`);
+            }).catch(error => {
+                console.error("Błąd podczas usuwania zadania:", error);
             });
         });
-
+    
         listItem.appendChild(deleteButton);
-        taskList.appendChild(listItem);
+        document.getElementById('task-list').appendChild(listItem);
     }
+    
+    
 
     // Pobieranie istniejących zadań z IndexedDB i wyświetlanie ich
     getTasks().then(tasks => {
@@ -190,43 +208,122 @@ document.addEventListener('DOMContentLoaded', () => {
         const taskText = taskInput.value.trim();
         if (taskText !== '') {
             addTask(taskText).then(() => {
-                displayTask({ content: taskText });
-                taskInput.value = '';
+                refreshTasks(); // Odśwież listę zadań po dodaniu nowego
+                taskInput.value = ''; // Wyczyszczenie pola tekstowego
+            }).catch(error => {
+                console.error("Błąd podczas dodawania zadania:", error);
             });
         }
     });
+    
+    
 
     // Pobieranie elementów związanych z notatkami głosowymi
-    const addVoiceNoteButton = document.getElementById('add-voice-note-button');
+    const startRecordingButton = document.getElementById('start-recording-button');
+    const stopRecordingButton = document.getElementById('stop-recording-button');
+    const recordingIndicator = document.getElementById('recording-indicator');
     const voiceNoteList = document.getElementById('voice-note-list');
+
+    let mediaRecorder;
+    let audioChunks = [];
+
+    // Rozpoczęcie nagrywania
+    startRecordingButton.addEventListener('click', () => {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+    
+                mediaRecorder.start();
+                console.log('Recording started');
+    
+                // Pokazanie napisu "Recording..."
+                recordingIndicator.textContent = "Recording...";
+                recordingIndicator.classList.remove('hidden');
+    
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+    
+                startRecordingButton.classList.add('hidden');
+                stopRecordingButton.classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error("Błąd podczas uzyskiwania dostępu do mikrofonu:", error);
+            });
+    });
+    
+
+    // Zatrzymanie nagrywania
+    stopRecordingButton.addEventListener('click', () => {
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+    
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                addVoiceNote(audioBlob).then(noteId => {
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    displayVoiceNote({ id: noteId, audioUrl }); // Natychmiastowe wyświetlenie nowej notatki
+                }).catch(error => {
+                    console.error("Błąd podczas dodawania notatki głosowej:", error);
+                });
+    
+                recordingIndicator.textContent = "";
+                recordingIndicator.classList.add('hidden');
+                startRecordingButton.classList.remove('hidden');
+                stopRecordingButton.classList.add('hidden');
+            };
+        }
+    });
 
     // Funkcja wyświetlania notatki głosowej w interfejsie użytkownika
     function displayVoiceNote(note) {
         const listItem = document.createElement('li');
-        listItem.textContent = note.content;
-        
+    
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = note.audioUrl;
+    
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
         deleteButton.addEventListener('click', () => {
             deleteVoiceNote(note.id).then(() => {
-                voiceNoteList.removeChild(listItem);
+                console.log('Notatka głosowa usunięta:', note.id); // Debug
+                listItem.remove(); // Usuń element z DOM
+            }).catch(error => {
+                console.error("Błąd podczas usuwania notatki głosowej:", error);
             });
         });
-
+    
+        listItem.appendChild(audio);
         listItem.appendChild(deleteButton);
-        voiceNoteList.appendChild(listItem);
+        document.getElementById('voice-note-list').appendChild(listItem);
     }
+
+    // Pobierz notatki głosowe po dodaniu nowej
+    function refreshVoiceNotes() {
+        document.getElementById('voice-note-list').innerHTML = ''; // Wyczyść istniejące elementy
+        getVoiceNotes().then(notes => {
+            notes.forEach(note => displayVoiceNote(note)); // Odtwórz notatki z bazy
+        }).catch(error => {
+            console.error("Błąd podczas odświeżania notatek głosowych:", error);
+        });
+    }
+    
+    // Pobierz zadania po dodaniu nowego
+    function refreshTasks() {
+        document.getElementById('task-list').innerHTML = ''; // Wyczyść istniejące elementy
+        getTasks().then(tasks => {
+            tasks.forEach(task => displayTask(task)); // Odtwórz zadania z bazy
+        }).catch(error => {
+            console.error("Błąd podczas odświeżania zadań:", error);
+        });
+    }
+
+    
 
     // Pobieranie istniejących notatek głosowych z IndexedDB i wyświetlanie ich
     getVoiceNotes().then(notes => {
         notes.forEach(note => displayVoiceNote(note));
-    });
-
-    // Obsługa dodawania nowej notatki głosowej
-    addVoiceNoteButton.addEventListener('click', () => {
-        const noteText = 'Notatka głosowa (funkcjonalność do zaimplementowania)'; // Placeholder
-        addVoiceNote(noteText).then(() => {
-            displayVoiceNote({ content: noteText });
-        });
     });
 });

@@ -19,11 +19,13 @@
         </nav>
     </header>
     <main>
+        <!-- Widok ekranu głównego -->
         <section id="home-view" class="view">
             <h2>Welcome to the To-Do List App</h2>
             <p>Manage your tasks and voice notes efficiently.</p>
         </section>
         
+        <!-- Widok listy zadań -->
         <section id="tasks-view" class="view hidden">
             <h2>Tasks</h2>
             <section class="todo-list">
@@ -37,6 +39,7 @@
             </section>
         </section>
         
+        <!-- Widok notatek głosowych -->
         <section id="voice-notes-view" class="view hidden">
             <h2>Voice Notes</h2>
             <section class="voice-notes">
@@ -44,7 +47,11 @@
                     <!-- Notatki głosowe będą tutaj dodawane dynamicznie przez JavaScript -->
                 </ul>
             </section>
-            <button id="add-voice-note-button">Add Voice Note</button>
+            <section class="recording-controls">
+                <button id="start-recording-button">Start Recording</button>
+                <button id="stop-recording-button" class="hidden">Stop Recording</button>
+                <div id="recording-indicator" class="hidden">Recording...</div>
+            </section>
         </section>
     </main>
     <footer>
@@ -54,7 +61,7 @@
     <!-- Skrypt aplikacji -->
     <script src="app.js"></script>
     
-    <!-- Rejestracja Service Worker -->
+    <!-- Rejestracja Service Workera -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
