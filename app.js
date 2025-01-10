@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
     
                 // Utwórz MediaRecorder z odpowiednim MIME
-                mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
                 audioChunks = [];
     
                 mediaRecorder.start();
@@ -276,8 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mediaRecorder.stop();
     
             mediaRecorder.onstop = () => {
-                const mimeType = mediaRecorder.mimeType || 'audio/webm'; // Pobierz użyty MIME
-                const audioBlob = new Blob(audioChunks, { type: mimeType });
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 console.log('Generated audio Blob:', audioBlob);
     
                 addVoiceNote(audioBlob).then(noteId => {
@@ -302,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         const audio = document.createElement('audio');
         audio.controls = true;
-        audio.src = note.audioUrl;
+        audio.src = URL.createObjectURL(note.content);
     
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
