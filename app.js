@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startRecordingButton.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp4' });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mpeg' });
                 audioChunks = [];
     
                 mediaRecorder.start();
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mediaRecorder.stop();
     
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
+                const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
                 addVoiceNote(audioBlob).then(noteId => {
                     const audioUrl = URL.createObjectURL(audioBlob);
                     displayVoiceNote({ id: noteId, audioUrl }); // Natychmiastowe wyświetlenie nowej notatki
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         const audio = document.createElement('audio');
         audio.controls = true;
-        audio.src = note.audioUrl;
+        audio.src = URL.createObjectURL(note.content);
     
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
