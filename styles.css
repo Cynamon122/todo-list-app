@@ -88,9 +88,8 @@ footer {
     margin-top: 2rem;
 }
 
-/* Style dla wskaźnika nagrywania */
 #recording-indicator {
-    display: none; /* Domyślnie ukryte */
+    display: none; 
     position: fixed;
     top: 20px;
     left: 50%;
@@ -103,13 +102,10 @@ footer {
     z-index: 1000;
 }
 
-/* Widoczny wskaźnik nagrywania */
 #recording-indicator.visible {
     display: block;
 }
 
-/* Styl przycisków start/stop nagrywania */
-#start-recording-button,
 #stop-recording-button {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
@@ -173,7 +169,6 @@ footer {
     background-color: #c82333;
 }
 
-/* Stylizacja listy zadań */
 #task-list {
     list-style-type: none;
     padding: 0;
@@ -210,7 +205,6 @@ footer {
     background-color: #c82333;
 }
 
-/* Styl dla pustego pola, jeśli lista jest pusta */
 #task-list:empty::before {
     content: "No tasks added yet!";
     display: block;
