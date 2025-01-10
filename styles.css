@@ -88,8 +88,9 @@ footer {
     margin-top: 2rem;
 }
 
+/* Style dla wskaźnika nagrywania */
 #recording-indicator {
-    display: none; 
+    display: none; /* Domyślnie ukryte */
     position: fixed;
     top: 20px;
     left: 50%;
@@ -102,10 +103,12 @@ footer {
     z-index: 1000;
 }
 
+/* Widoczny wskaźnik nagrywania */
 #recording-indicator.visible {
     display: block;
 }
 
+#start-recording-button,
 #stop-recording-button {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
