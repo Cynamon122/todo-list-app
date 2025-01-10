@@ -103,7 +103,6 @@ footer {
     z-index: 1000;
 }
 
-/* Widoczny wskaźnik nagrywania */
 #recording-indicator.visible {
     display: block;
 }
@@ -137,7 +136,6 @@ footer {
     background-color: #c82333;
 }
 
-/* Lista notatek głosowych */
 .voice-notes ul {
     list-style-type: none;
     padding: 0;
