@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startRecordingButton.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
-                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp4' });
                 audioChunks = [];
     
                 mediaRecorder.start();
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mediaRecorder.stop();
     
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
                 addVoiceNote(audioBlob).then(noteId => {
                     const audioUrl = URL.createObjectURL(audioBlob);
                     displayVoiceNote({ id: noteId, audioUrl }); // Natychmiastowe wyświetlenie nowej notatki
