@@ -1,18 +1,24 @@
 // Funkcja otwierająca bazę danych
+// Tworzy lub otwiera bazę IndexedDB o nazwie "ToDoListDB"
 function openDatabase() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open("ToDoListDB", 1);
 
+        // Wydarzenie na wypadek konieczności uaktualnienia bazy danych
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
+
+            // Tworzenie magazynu dla zadań i notatek głosowych
             db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
             db.createObjectStore("voiceNotes", { keyPath: "id", autoIncrement: true });
         };
 
+        // Wydarzenie przy pomyślnym otwarciu bazy danych
         request.onsuccess = (event) => {
             resolve(event.target.result);
         };
 
+        // Obsługa błędów podczas otwierania bazy danych
         request.onerror = (event) => {
             reject(event.target.error);
         };
@@ -25,6 +31,8 @@ function addTask(task) {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction("tasks", "readwrite");
             const store = transaction.objectStore("tasks");
+
+            // Dodanie zadania do magazynu "tasks"
             const request = store.add({ content: task });
 
             request.onsuccess = () => resolve();
@@ -39,6 +47,8 @@ function getTasks() {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction("tasks", "readonly");
             const store = transaction.objectStore("tasks");
+
+            // Pobranie wszystkich zadań
             const request = store.getAll();
 
             request.onsuccess = (event) => resolve(event.target.result);
@@ -53,6 +63,8 @@ function deleteTask(id) {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction("tasks", "readwrite");
             const store = transaction.objectStore("tasks");
+
+            // Usunięcie zadania na podstawie ID
             const request = store.delete(id);
 
             request.onsuccess = () => resolve();
@@ -67,6 +79,8 @@ function addVoiceNote(audioBlob) {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction("voiceNotes", "readwrite");
             const store = transaction.objectStore("voiceNotes");
+
+            // Dodanie notatki głosowej
             const request = store.add({ content: audioBlob });
 
             request.onsuccess = (event) => {
@@ -87,6 +101,8 @@ function getVoiceNotes() {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction("voiceNotes", "readonly");
             const store = transaction.objectStore("voiceNotes");
+
+            // Pobranie wszystkich notatek głosowych
             const request = store.getAll();
 
             request.onsuccess = (event) => {
@@ -108,6 +124,8 @@ function deleteVoiceNote(id) {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction("voiceNotes", "readwrite");
             const store = transaction.objectStore("voiceNotes");
+
+            // Usunięcie notatki głosowej na podstawie ID
             const request = store.delete(id);
 
             request.onsuccess = () => resolve();
@@ -119,6 +137,8 @@ function deleteVoiceNote(id) {
 // Funkcja do aktualizacji statusu połączenia w interfejsie użytkownika
 function updateConnectionStatus() {
     const statusIndicator = document.getElementById('connection-status');
+
+    // Wyświetlenie statusu połączenia
     if (navigator.onLine) {
         statusIndicator.textContent = 'Jesteś online';
         statusIndicator.style.color = 'green';
@@ -128,7 +148,7 @@ function updateConnectionStatus() {
     }
 }
 
-// Event listener, który sprawdza, czy użytkownik jest online czy offline
+// Obsługa zdarzeń zmiany statusu połączenia
 window.addEventListener('online', updateConnectionStatus);
 window.addEventListener('offline', updateConnectionStatus);
 
@@ -145,10 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
     statusIndicator.style.borderRadius = '5px';
     document.body.appendChild(statusIndicator);
 
-    // Ustaw początkowy status połączenia
+    // Ustawienie początkowego statusu połączenia
     updateConnectionStatus();
 
-    // Pobieranie widoków: ekranu głównego, listy zadań oraz notatek głosowych
+    // Pobieranie widoków aplikacji
     const homeView = document.getElementById('home-view');
     const tasksView = document.getElementById('tasks-view');
     const voiceNotesView = document.getElementById('voice-notes-view');
@@ -158,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navTasks = document.getElementById('nav-tasks');
     const navVoiceNotes = document.getElementById('nav-voice-notes');
 
-    // Funkcja do przełączania widoku aplikacji
+    // Funkcja przełączania widoku aplikacji
     function showView(view) {
         homeView.classList.add('hidden');
         tasksView.classList.add('hidden');
@@ -171,34 +191,32 @@ document.addEventListener('DOMContentLoaded', () => {
     navTasks.addEventListener('click', () => showView(tasksView));
     navVoiceNotes.addEventListener('click', () => showView(voiceNotesView));
 
-    // Pobieranie elementów związanych z zadaniami
+    // Obsługa zadań
     const taskInput = document.getElementById('task-input');
     const addTaskButton = document.getElementById('add-task-button');
     const taskList = document.getElementById('task-list');
 
-    // Funkcja wyświetlania zadania w interfejsie użytkownika
+    // Funkcja wyświetlania zadania w interfejsie
     function displayTask(task) {
         const listItem = document.createElement('li');
         listItem.textContent = task.content;
-    
+
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
         deleteButton.addEventListener('click', () => {
             deleteTask(task.id).then(() => {
-                listItem.remove(); // Usuń zadanie z DOM
+                listItem.remove(); // Usunięcie elementu z DOM
                 console.log(`Zadanie ${task.id} zostało usunięte.`);
             }).catch(error => {
                 console.error("Błąd podczas usuwania zadania:", error);
             });
         });
-    
+
         listItem.appendChild(deleteButton);
         document.getElementById('task-list').appendChild(listItem);
     }
-    
-    
 
-    // Pobieranie istniejących zadań z IndexedDB i wyświetlanie ich
+    // Pobranie istniejących zadań z IndexedDB
     getTasks().then(tasks => {
         tasks.forEach(task => displayTask(task));
     });
@@ -208,71 +226,82 @@ document.addEventListener('DOMContentLoaded', () => {
         const taskText = taskInput.value.trim();
         if (taskText !== '') {
             addTask(taskText).then(() => {
-                refreshTasks(); // Odśwież listę zadań po dodaniu nowego
+                refreshTasks(); // Odświeżenie listy zadań
                 taskInput.value = ''; // Wyczyszczenie pola tekstowego
             }).catch(error => {
                 console.error("Błąd podczas dodawania zadania:", error);
             });
         }
     });
-    
-    
 
-    // Pobieranie elementów związanych z notatkami głosowymi
+    // Obsługa notatek głosowych
     const startRecordingButton = document.getElementById('start-recording-button');
     const stopRecordingButton = document.getElementById('stop-recording-button');
     const recordingIndicator = document.getElementById('recording-indicator');
-    const voiceNoteList = document.getElementById('voice-note-list');
 
     let mediaRecorder;
     let audioChunks = [];
 
     // Rozpoczęcie nagrywania
     startRecordingButton.addEventListener('click', () => {
+        // Sprawdzenie obsługi MediaRecorder
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('Twoja przeglądarka nie obsługuje API MediaRecorder.');
+            return;
+        }
+    
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
-                let mimeType = 'audio/webm';
-    
-                // Sprawdź, czy obsługiwany jest kodek opus
-                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                    mimeType = 'audio/webm;codecs=opus';
-                } else if (MediaRecorder.isTypeSupported('audio/mpeg')) {
-                    mimeType = 'audio/mpeg'; // Dodane wsparcie dla mpeg
+                // Sprawdzenie dostępnych MIME typów
+                let mimeType = 'audio/webm;codecs=opus';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/webm';
+                }
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/mp4'; // Dla Safari
+                }
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = ''; // Użyj domyślnego, jeśli żaden typ nie jest obsługiwany
                 }
     
-                // Utwórz MediaRecorder z odpowiednim MIME
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-                audioChunks = [];
+                try {
+                    mediaRecorder = new MediaRecorder(stream, { mimeType });
+                    audioChunks = [];
     
-                mediaRecorder.start();
-                console.log('Recording started with MIME type:', mimeType);
+                    mediaRecorder.start();
+                    console.log('Recording started with MIME type:', mimeType);
     
-                // Pokazanie napisu "Recording..."
-                recordingIndicator.textContent = "Recording...";
-                recordingIndicator.classList.remove('hidden');
+                    // Aktualizacja interfejsu
+                    recordingIndicator.textContent = "Recording...";
+                    recordingIndicator.classList.remove('hidden');
+                    startRecordingButton.classList.add('hidden');
+                    stopRecordingButton.classList.remove('hidden');
     
-                mediaRecorder.ondataavailable = event => {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                        console.log('Audio chunk received:', event.data);
-                    } else {
-                        console.warn('Received empty audio chunk.');
-                    }
-                };
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                            console.log('Audio chunk received:', event.data);
+                        }
+                    };
     
-                startRecordingButton.classList.add('hidden');
-                stopRecordingButton.classList.remove('hidden');
+                    mediaRecorder.onerror = event => {
+                        console.error('Błąd MediaRecorder:', event.error);
+                    };
+                } catch (error) {
+                    console.error('Błąd podczas tworzenia MediaRecorder:', error);
+                    alert('Twoja przeglądarka nie obsługuje wybranego formatu audio.');
+                }
             })
             .catch(error => {
-                console.error("Błąd podczas uzyskiwania dostępu do mikrofonu:", error);
+                console.error('Błąd podczas uzyskiwania dostępu do mikrofonu:', error);
+                alert('Nie udało się uzyskać dostępu do mikrofonu.');
             });
     });
-    
     
 
     // Zatrzymanie nagrywania
     stopRecordingButton.addEventListener('click', () => {
-        if (mediaRecorder) {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
     
             mediaRecorder.onstop = () => {
@@ -286,34 +315,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Błąd podczas zapisu notatki głosowej:', error);
                 });
     
+                // Aktualizacja interfejsu
                 recordingIndicator.textContent = "";
                 recordingIndicator.classList.add('hidden');
                 startRecordingButton.classList.remove('hidden');
                 stopRecordingButton.classList.add('hidden');
             };
+        } else {
+            alert('Nagrywanie jeszcze się nie rozpoczęło!');
         }
     });
     
 
-    // Funkcja wyświetlania notatki głosowej w interfejsie użytkownika
+    // Funkcja wyświetlania notatki głosowej
     function displayVoiceNote(note) {
         const listItem = document.createElement('li');
-    
+
         const audio = document.createElement('audio');
         audio.controls = true;
         audio.src = note.audioUrl;
-    
+
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
         deleteButton.addEventListener('click', () => {
             deleteVoiceNote(note.id).then(() => {
-                console.log('Notatka głosowa usunięta:', note.id); // Debug
-                listItem.remove(); // Usuń element z DOM
+                listItem.remove();
             }).catch(error => {
                 console.error("Błąd podczas usuwania notatki głosowej:", error);
             });
         });
-    
+
         listItem.appendChild(audio);
         listItem.appendChild(deleteButton);
         document.getElementById('voice-note-list').appendChild(listItem);
@@ -321,27 +352,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Pobierz notatki głosowe po dodaniu nowej
     function refreshVoiceNotes() {
-        document.getElementById('voice-note-list').innerHTML = ''; // Wyczyść istniejące elementy
+        document.getElementById('voice-note-list').innerHTML = '';
         getVoiceNotes().then(notes => {
-            notes.forEach(note => displayVoiceNote(note)); // Odtwórz notatki z bazy
+            notes.forEach(note => displayVoiceNote(note));
         }).catch(error => {
             console.error("Błąd podczas odświeżania notatek głosowych:", error);
         });
     }
-    
+
     // Pobierz zadania po dodaniu nowego
     function refreshTasks() {
-        document.getElementById('task-list').innerHTML = ''; // Wyczyść istniejące elementy
+        document.getElementById('task-list').innerHTML = '';
         getTasks().then(tasks => {
-            tasks.forEach(task => displayTask(task)); // Odtwórz zadania z bazy
+            tasks.forEach(task => displayTask(task));
         }).catch(error => {
             console.error("Błąd podczas odświeżania zadań:", error);
         });
     }
 
-    
-
-    // Pobieranie istniejących notatek głosowych z IndexedDB i wyświetlanie ich
+    // Pobranie istniejących notatek głosowych
     getVoiceNotes().then(notes => {
         notes.forEach(note => displayVoiceNote(note));
     });
