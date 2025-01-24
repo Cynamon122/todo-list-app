@@ -214,3 +214,24 @@ footer {
     font-style: italic;
     margin-top: 1rem;
 }
+
+.update-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#stats {
+    margin-top: 20px;
+    font-size: 1.2rem;
+}
+
+#stats p {
+    margin: 5px 0;
+}

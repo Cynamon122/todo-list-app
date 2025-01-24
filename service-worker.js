@@ -5,7 +5,9 @@ const URLS_TO_CACHE = [
     '/styles.css',       // Plik stylów CSS
     '/app.js',           // Główny skrypt aplikacji
     '/manifest.json',    // Plik manifestu dla PWA
-    '/icon.png'          // Ikona aplikacji
+    '/icon.png',         // Ikona aplikacji
+    '/offline.html'      // Dodano offline.html
+
 ];
 
 // Instalacja Service Workera i dodanie zasobów do cache
