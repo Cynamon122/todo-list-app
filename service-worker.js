@@ -22,21 +22,20 @@ self.addEventListener('install', event => {
 });
 
 // Aktywacja Service Workera i usuwanie starych cache
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
+    const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
-        caches.keys().then(cacheNames => {
+        caches.keys().then((cacheNames) => {
             return Promise.all(
-                cacheNames.map(cacheName => {
-                    // Usuń cache, jeśli nazwa nie pasuje do aktualnej wersji
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Usuwam stary cache', cacheName); // Logowanie usuwania starych cache
+                cacheNames.map((cacheName) => {
+                    if (!cacheWhitelist.includes(cacheName)) {
                         return caches.delete(cacheName);
                     }
                 })
             );
         })
     );
-    self.clients.claim(); // Przejęcie kontroli nad wszystkimi aktywnymi klientami (oknami przeglądarki)
+    self.clients.claim(); // Natychmiastowe przejęcie kontroli przez nowego Service Workera
 });
 
 // Obsługa żądań sieciowych z różnymi strategiami buforowania

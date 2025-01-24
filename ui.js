@@ -16,3 +16,5 @@ export function showView(view) {
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
     view.classList.remove('hidden');
 }
+
+

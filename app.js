@@ -1,6 +1,6 @@
 // Główna obsługa aplikacji
-import { addTask, getTasks, deleteTask, refreshTasks } from './tasks.js';
-import { addVoiceNote, getVoiceNotes, deleteVoiceNote, refreshVoiceNotes } from './voiceNotes.js';
+import { addTask, getTasks, deleteTask, refreshTasks } from './database.js';
+import { addVoiceNote, getVoiceNotes, deleteVoiceNote, refreshVoiceNotes } from './database.js';
 import { updateConnectionStatus, showView } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {

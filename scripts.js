@@ -1,5 +1,5 @@
-import { getTasks } from './tasks.js';
-import { getVoiceNotes } from './voiceNotes.js';
+import { getTasks } from './database.js';
+import { getVoiceNotes } from './database.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Inicjalizacja wskaźnika połączenia
