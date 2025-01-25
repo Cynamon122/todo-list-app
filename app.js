@@ -418,16 +418,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pobierz notatki głosowe po dodaniu nowej
     function refreshVoiceNotes() {
         const voiceNoteList = document.getElementById('voice-note-list');
-        voiceNoteList.innerHTML = '';
-        getVoiceNotes().then(notes => notes.forEach(note => displayVoiceNote(note)));
+        voiceNoteList.innerHTML = ''; // Czyści listę przed dodaniem nowych elementów
+    
+        getVoiceNotes().then(notes => {
+            notes.forEach(note => displayVoiceNote(note));
+        }).catch(error => {
+            console.error("Błąd podczas odświeżania notatek głosowych:", error);
+        });
     }
+    
     
 
     // Pobierz zadania po dodaniu nowego
     function refreshTasks() {
         const taskList = document.getElementById('task-list');
-        taskList.innerHTML = '';
-        getTasks().then(tasks => tasks.forEach(task => displayTask(task)));
+        taskList.innerHTML = ''; // Czyści listę przed dodaniem nowych elementów
+    
+        getTasks().then(tasks => {
+            tasks.forEach(task => displayTask(task));
+        }).catch(error => {
+            console.error("Błąd podczas odświeżania zadań:", error);
+        });
     }
     
 
