@@ -10,14 +10,7 @@ if ('serviceWorker' in navigator) {
             if (event.data.type === 'SERVICE_WORKER_UPDATED') {
                 const updateNotification = document.createElement('div');
                 updateNotification.textContent = 'Nowa wersja aplikacji jest dostępna. Kliknij, aby odświeżyć.';
-                updateNotification.style.position = 'fixed';
-                updateNotification.style.bottom = '0';
-                updateNotification.style.width = '100%';
-                updateNotification.style.backgroundColor = '#ff9800';
-                updateNotification.style.color = '#fff';
-                updateNotification.style.textAlign = 'center';
-                updateNotification.style.padding = '1rem';
-                updateNotification.style.cursor = 'pointer';
+                updateNotification.classList.add('update-notification'); // Dodaj klasę CSS
 
                 updateNotification.addEventListener('click', () => {
                     window.location.reload();
@@ -228,31 +221,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const listItem = document.createElement('li');
         listItem.textContent = task.content;
     
-        // Przycisk usuwania
+        // Kontener na przyciski
+        const buttonGroup = document.createElement('div');
+        buttonGroup.classList.add('button-group');
+    
+        // Przycisk "Usuń"
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Usuń';
-        deleteButton.classList.add('delete'); // Dodanie klasy
+        deleteButton.classList.add('delete');
         deleteButton.addEventListener('click', () => {
             deleteTask(task.id).then(() => listItem.remove());
         });
     
-        // Przycisk edycji
+        // Przycisk "Edytuj"
         const editButton = document.createElement('button');
         editButton.textContent = 'Edytuj';
-        editButton.classList.add('edit'); // Dodanie klasy
+        editButton.classList.add('edit');
         editButton.addEventListener('click', () => {
             const newContent = prompt('Edytuj zadanie:', task.content);
             if (newContent) {
                 updateTask(task.id, newContent).then(() => {
-                    refreshTasks(); // Odświeżenie listy zadań po edycji
+                    refreshTasks();
                 });
             }
         });
     
-        listItem.appendChild(deleteButton);
-        listItem.appendChild(editButton);
+        // Dodanie przycisków do kontenera
+        buttonGroup.appendChild(editButton);
+        buttonGroup.appendChild(deleteButton);
+    
+        // Dodanie treści i przycisków do elementu listy
+        listItem.appendChild(buttonGroup);
         document.getElementById('task-list').appendChild(listItem);
     }
+    
     
 
     function updateTask(id, newContent) {
