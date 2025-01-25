@@ -9,6 +9,7 @@ To-Do List App to progresywna aplikacja webowa (PWA), która pozwala użytkownik
 - **Zarządzanie zadaniami tekstowymi**:
   - Dodawanie zadań.
   - Usuwanie zadań.
+  - Edycja zadań 
 - **Notatki głosowe**:
   - Nagrywanie notatek głosowych za pomocą mikrofonu.
   - Odtwarzanie nagranych notatek.
