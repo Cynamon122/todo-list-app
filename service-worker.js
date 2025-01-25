@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-todo-app-cache-v1'; // Nazwa cache, aby umożliwić zarządzanie wersjami
+const CACHE_NAME = 'my-todo-app-cache-v2'; // Zmieniono wersję cache na v2
 const URLS_TO_CACHE = [
     '/',                 // Strona główna aplikacji
     '/index.html',       // Główna strona HTML
@@ -6,72 +6,80 @@ const URLS_TO_CACHE = [
     '/app.js',           // Główny skrypt aplikacji
     '/manifest.json',    // Plik manifestu dla PWA
     '/icon.png',         // Ikona aplikacji
-    '/offline.html'      // Dodano offline.html
-
+    '/offline.html'      // Plik offline jako fallback
 ];
 
-// Instalacja Service Workera i dodanie zasobów do cache
+// Instalacja Service Workera
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            console.log('Otwieram cache i dodaję zasoby'); // Logowanie instalacji cache
-            return cache.addAll(URLS_TO_CACHE); // Dodanie zasobów do cache
+            const fullUrlsToCache = URLS_TO_CACHE.map(path =>
+                new URL(path, self.location.origin).href
+            );
+            return cache.addAll(fullUrlsToCache);
         })
     );
-    self.skipWaiting(); // Umożliwia natychmiastowe przejęcie kontroli przez nowego Service Workera
+    self.skipWaiting(); // Natychmiastowe przejęcie kontroli
 });
 
-// Aktywacja Service Workera i usuwanie starych cache
-self.addEventListener('activate', (event) => {
-    const cacheWhitelist = [CACHE_NAME];
+
+// Aktywacja Service Workera
+self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
+        caches.keys().then(cacheNames => {
             return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (!cacheWhitelist.includes(cacheName)) {
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
                         return caches.delete(cacheName);
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
-    self.clients.claim(); // Natychmiastowe przejęcie kontroli przez nowego Service Workera
+
+    // Powiadomienie klientów o aktualizacji
+    self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
+        clients.forEach(client => {
+            client.postMessage({ type: 'SERVICE_WORKER_UPDATED' });
+        });
+    });
 });
 
-// Obsługa żądań sieciowych z różnymi strategiami buforowania
-self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url); // Parsowanie URL żądania
 
-    // Strategia Cache First dla statycznych zasobów
-    if (URLS_TO_CACHE.includes(url.pathname)) {
+// Obsługa żądań sieciowych
+self.addEventListener('fetch', event => {
+    const url = new URL(event.request.url);
+
+    // Obsługa zasobów z URLS_TO_CACHE
+    if (URLS_TO_CACHE.some(path => new URL(path, self.location.origin).href === url.href)) {
         event.respondWith(
-            caches.match(event.request).then(response => {
-                // Jeśli zasób jest w cache, zwróć go
-                return response || fetch(event.request).then(networkResponse => {
-                    // Jeśli nie ma w cache, pobierz z sieci, a następnie zapisz w cache
-                    return caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, networkResponse.clone()); // Skopiowanie odpowiedzi do cache
-                        return networkResponse; // Zwrócenie odpowiedzi do użytkownika
+            caches.open(CACHE_NAME).then(cache => {
+                return cache.match(event.request).then(cachedResponse => {
+                    const fetchPromise = fetch(event.request).then(networkResponse => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
                     });
+                    return cachedResponse || fetchPromise;
                 });
-            }).catch(() => {
-                // Fallback w przypadku braku sieci lub cache
-                return caches.match('/offline.html'); // Plik offline jako zasób awaryjny
             })
         );
     } else {
-        // Strategia Network First dla dynamicznych zasobów (np. API)
+        // Network First dla innych zasobów
         event.respondWith(
             fetch(event.request).then(networkResponse => {
-                // Pobierz z sieci i zapisz w cache
                 return caches.open(CACHE_NAME).then(cache => {
                     cache.put(event.request, networkResponse.clone());
-                    return networkResponse; // Zwrócenie odpowiedzi do użytkownika
+                    return networkResponse;
                 });
-            }).catch(() => {
-                // W przypadku błędu sieci, spróbuj znaleźć zasób w cache
-                return caches.match(event.request);
-            })
+            }).catch(() => caches.match('/offline.html'))
         );
+    }
+});
+
+
+// Obsługa komunikatów między Service Workerem a aplikacją
+self.addEventListener('message', event => {
+    if (event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
     }
 });

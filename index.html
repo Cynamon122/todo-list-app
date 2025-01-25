@@ -21,14 +21,15 @@
     <main>
         <!-- Widok ekranu głównego -->
         <section id="home-view" class="view">
-            <h2>Welcome to the To-Do List App2</h2>
+            <h2>Welcome to the To-Do List App</h2>
             <p>Manage your tasks and voice notes efficiently.</p>
-            <div id="stats">
-                <p>Total Tasks: <span id="total-tasks">0</span></p>
-                <p>Total Voice Notes: <span id="total-voice-notes">0</span></p>
-            </div>
+
+            <section class="summary">
+                <p><strong>Total Tasks:</strong> <span id="task-count">0</span></p>
+                <p><strong>Total Voice Notes:</strong> <span id="voice-note-count">0</span></p>
+            </section>
+            
         </section>
-        
         
         <!-- Widok listy zadań -->
         <section id="tasks-view" class="view hidden">
@@ -62,11 +63,13 @@
     <footer>
         <p>&copy; 2024 To-Do List App</p>
     </footer>
-
+    
     <!-- Skrypt aplikacji -->
-    <script src="scripts.js" type="module"></script>
-
+    <script src="app.js"></script>
+    
     <!-- Rejestracja Service Workera -->
-    <script src="service-worker-register.js" type="module"></script>
+    <script src="register-sw.js"></script>
+
+
 </body>
 </html>

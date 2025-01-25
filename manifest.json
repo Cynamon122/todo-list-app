@@ -1,16 +1,31 @@
 {
   "name": "To-Do List App",
-  "short_name": "To-Do App",
-  "start_url": "/index.html",
+  "short_name": "To-Do",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f0f2f5",
   "theme_color": "#007bff",
-  "description": "A Progressive Web App for managing tasks and voice notes.",
+  "description": "Prosta i funkcjonalna aplikacja do zarządzania zadaniami i notatkami głosowymi.",
   "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
+      {
+          "src": "icon-72x72.png",
+          "sizes": "72x72",
+          "type": "image/png"
+      },
+      {
+          "src": "icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+      },
+      {
+          "src": "icon-384x384.png",
+          "sizes": "384x384",
+          "type": "image/png"
+      },
+      {
+          "src": "icon-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+      }
   ]
 }
