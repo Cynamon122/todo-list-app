@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-todo-app-cache-v2'; // Zmieniono wersję cache na v2
+const CACHE_NAME = 'my-todo-app-cache-v2'; // Nazwa cache, aby zarządzać wersjami
 const URLS_TO_CACHE = [
     '/',                 // Strona główna aplikacji
     '/index.html',       // Główna strona HTML
@@ -11,75 +11,82 @@ const URLS_TO_CACHE = [
 
 // Instalacja Service Workera
 self.addEventListener('install', event => {
+    // Otwórz cache i zapisz określone zasoby
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
+            // Zamień względne ścieżki na pełne URL (zapewnia poprawne porównywanie)
             const fullUrlsToCache = URLS_TO_CACHE.map(path =>
                 new URL(path, self.location.origin).href
             );
+            // Dodaj wszystkie zasoby do cache
             return cache.addAll(fullUrlsToCache);
         })
     );
-    self.skipWaiting(); // Natychmiastowe przejęcie kontroli
+    self.skipWaiting(); // Natychmiast aktywuj nową wersję Service Workera
 });
-
 
 // Aktywacja Service Workera
 self.addEventListener('activate', event => {
+    // Usuwanie starego cache
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cacheName => {
+                    // Jeśli cache jest innej wersji, usuń go
                     if (cacheName !== CACHE_NAME) {
                         return caches.delete(cacheName);
                     }
                 })
             );
-        }).then(() => self.clients.claim())
+        }).then(() => self.clients.claim()) // Przejęcie kontroli nad aplikacją
     );
 
-    // Powiadomienie klientów o aktualizacji
+    // Powiadomienie klientów o aktualizacji Service Workera
     self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
         clients.forEach(client => {
+            // Wyślij wiadomość do aplikacji o aktualizacji
             client.postMessage({ type: 'SERVICE_WORKER_UPDATED' });
         });
     });
 });
 
-
 // Obsługa żądań sieciowych
 self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
+    const url = new URL(event.request.url); // Pobierz pełny URL żądania
 
-    // Obsługa zasobów z URLS_TO_CACHE
+    // Obsługa zasobów z listy URLS_TO_CACHE
     if (URLS_TO_CACHE.some(path => new URL(path, self.location.origin).href === url.href)) {
         event.respondWith(
             caches.open(CACHE_NAME).then(cache => {
                 return cache.match(event.request).then(cachedResponse => {
+                    // Pobierz zasób z cache lub sieci (i zapisz go w cache)
                     const fetchPromise = fetch(event.request).then(networkResponse => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
+                        cache.put(event.request, networkResponse.clone()); // Zaktualizuj cache
+                        return networkResponse; // Zwróć zasób z sieci
                     });
+                    // Jeśli zasób jest w cache, zwróć go natychmiast
                     return cachedResponse || fetchPromise;
                 });
             })
         );
     } else {
-        // Network First dla innych zasobów
+        // Dla innych zasobów użyj strategii Network First
         event.respondWith(
             fetch(event.request).then(networkResponse => {
+                // Pobierz zasób z sieci i zapisz w cache
                 return caches.open(CACHE_NAME).then(cache => {
                     cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
+                    return networkResponse; // Zwróć zasób z sieci
                 });
-            }).catch(() => caches.match('/offline.html'))
+            }).catch(() => caches.match('/offline.html')) // Jeśli brak sieci, zwróć offline.html
         );
     }
 });
 
-
 // Obsługa komunikatów między Service Workerem a aplikacją
 self.addEventListener('message', event => {
     if (event.data.type === 'SKIP_WAITING') {
+        // Natychmiast aktywuj nowego Service Workera
         self.skipWaiting();
     }
 });
