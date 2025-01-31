@@ -1,29 +1,27 @@
 const CACHE_NAME = 'my-todo-app-cache-v2'; // Nazwa cache, aby zarządzać wersjami
 const URLS_TO_CACHE = [
-    '/',                 // Strona główna aplikacji
-    '/index.html',       // Główna strona HTML
-    '/styles.css',       // Plik stylów CSS
-    '/app.js',           // Główny skrypt aplikacji
-    '/manifest.json',    // Plik manifestu dla PWA
-    '/icon.png',         // Ikona aplikacji
-    '/offline.html'      // Plik offline jako fallback
+    './',                 // Strona główna aplikacji
+    './index.html',       // Główna strona HTML
+    './styles.css',       // Plik stylów CSS
+    './app.js',           // Główny skrypt aplikacji
+    './manifest.json',    // Plik manifestu dla PWA
+    './icon.png',         // Ikona aplikacji
+    './offline.html'      // Plik offline jako fallback
 ];
 
 // Instalacja Service Workera
 self.addEventListener('install', event => {
-    // Otwórz cache i zapisz określone zasoby
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            // Zamień względne ścieżki na pełne URL (zapewnia poprawne porównywanie)
-            const fullUrlsToCache = URLS_TO_CACHE.map(path =>
-                new URL(path, self.location.origin).href
-            );
-            // Dodaj wszystkie zasoby do cache
-            return cache.addAll(fullUrlsToCache);
-        })
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                return cache.addAll(URLS_TO_CACHE)
+                    .catch(error => {
+                        console.error('Błąd podczas cachowania:', error);
+                    });
+            })
     );
-    self.skipWaiting(); // Natychmiast aktywuj nową wersję Service Workera
 });
+
 
 // Aktywacja Service Workera
 self.addEventListener('activate', event => {
