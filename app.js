@@ -174,7 +174,7 @@ function isActuallyOnline() {
                 }
             })
             .catch(error => {
-                console.warn("Brak internetu (`fetch` error) – to normalne w trybie offline.");
+                console.warn("Brak internetu (`fetch` error) – to normalne w trybie offline.", error);
                 resolve(false);
             });
 
