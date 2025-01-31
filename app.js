@@ -208,10 +208,48 @@ function updateConnectionStatus() {
     });
 }
 
-// 🔹 Uruchom funkcję od razu po załadowaniu strony
+// Uruchom funkcję od razu po załadowaniu strony
 document.addEventListener('DOMContentLoaded', updateConnectionStatus);
 window.addEventListener('online', updateConnectionStatus);
 window.addEventListener('offline', updateConnectionStatus);
+
+// Funkcja do sprawdzania i uzyskiwania zgody na powiadomienia
+function requestNotificationPermission() {
+    if ('Notification' in window) {
+        if (Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                console.log("Status zgody na powiadomienia:", permission);
+            });
+        }
+    }
+}
+
+// Funkcja do wysyłania powiadomień
+function sendNotification(taskContent) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification("Nowe zadanie dodane!", {
+            body: taskContent,
+            icon: './icon-192x192.png' // Możesz podmienić na inną ikonę
+        });
+    }
+}
+
+// Uruchomienie prośby o powiadomienia po załadowaniu strony
+document.addEventListener('DOMContentLoaded', requestNotificationPermission);
+
+// Modyfikacja dodawania zadania, aby wysyłać powiadomienie
+addTaskButton.addEventListener('click', () => {
+    const taskText = taskInput.value.trim();
+    if (taskText !== '') {
+        addTask(taskText).then(() => {
+            refreshTasks(); 
+            taskInput.value = ''; 
+            sendNotification(taskText); // Wysyłamy powiadomienie po dodaniu
+        }).catch(error => {
+            console.error("Błąd podczas dodawania zadania:", error);
+        });
+    }
+});
 
 
 // Główna obsługa aplikacji
