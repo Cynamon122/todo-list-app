@@ -50,46 +50,27 @@ self.addEventListener('activate', event => {
 
 // Obsługa żądań sieciowych
 self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url); // Pobierz pełny URL żądania
+    const url = new URL(event.request.url);
 
-    // Obsługa zasobów z listy URLS_TO_CACHE
-    if (URLS_TO_CACHE.some(path => new URL(path, self.location.origin).href === url.href)) {
-        event.respondWith(
-            caches.open(CACHE_NAME).then(cache => {
-                return cache.match(event.request).then(cachedResponse => {
-                    // Pobierz zasób z cache lub sieci (i zapisz go w cache)
-                    const fetchPromise = fetch(event.request).then(networkResponse => {
-                        cache.put(event.request, networkResponse.clone()); // Zaktualizuj cache
-                        return networkResponse; // Zwróć zasób z sieci
-                    });
-                    // Jeśli zasób jest w cache, zwróć go natychmiast
-                    return cachedResponse || fetchPromise;
-                });
-            })
-        );
-    } else {
-        // Dla innych zasobów użyj strategii Network First
-        event.respondWith(
-            fetch(event.request)
-                .then(networkResponse => {
-                    return caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, networkResponse.clone());
+    event.respondWith(
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.match(event.request).then(cachedResponse => {
+                const fetchPromise = fetch(event.request)
+                    .then(networkResponse => {
+                        cache.put(event.request, networkResponse.clone()); // Aktualizacja cache
                         return networkResponse;
+                    })
+                    .catch(() => {
+                        console.warn("⚠️ Brak dostępu do sieci i brak w cache:", event.request.url);
+                        return cachedResponse || handleOfflineResponse(event);
                     });
-                })
-                .catch(() => {
-                    return caches.match(event.request).then(cachedResponse => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        } else {
-                            return caches.match('/offline.html');
-                        }
-                    });
-                })
-        );
-        
-    }
+
+                return cachedResponse || fetchPromise;
+            });
+        })
+    );
 });
+
 
 // Obsługa komunikatów między Service Workerem a aplikacją
 self.addEventListener('message', event => {
