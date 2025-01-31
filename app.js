@@ -165,7 +165,10 @@ function isActuallyOnline() {
 
         fetch("https://cynamon122.github.io/todo-list-app/test-connection.txt?nocache=" + Date.now(), { cache: "no-store" })
             .then(response => {
-                if (response.ok) {
+                if (response.status === 404) { 
+                    console.warn("`404 Not Found` – ale internet działa! Ignorujemy ten błąd.");
+                    resolve(true);
+                } else if (response.ok) {
                     console.log("Test połączenia powiódł się → Online!");
                     resolve(true);
                 } else {
