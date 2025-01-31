@@ -156,6 +156,7 @@ function deleteVoiceNote(id) {
 // Funkcja do aktualizacji statusu połączenia w interfejsie użytkownika
 function updateConnectionStatus() {
     const statusIndicator = document.getElementById('connection-status');
+    
     if (navigator.onLine) {
         statusIndicator.textContent = 'Jesteś online';
         statusIndicator.classList.add('online');
@@ -167,11 +168,11 @@ function updateConnectionStatus() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', updateConnectionStatus);
 
 // Obsługa zmiany statusu połączenia
 window.addEventListener('online', updateConnectionStatus);
 window.addEventListener('offline', updateConnectionStatus);
-
 
 // Główna obsługa aplikacji
 document.addEventListener('DOMContentLoaded', () => {
