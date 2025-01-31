@@ -163,18 +163,17 @@ function isActuallyOnline() {
             return;
         }
 
-        fetch("https://www.gstatic.com/generate_204", { mode: "no-cors" })
+        fetch("https://www.gstatic.com/generate_204", { mode: "no-cors" }) 
             .then(() => {
                 console.log("Test połączenia powiódł się → Online!");
                 resolve(true);
             })
-            .catch(error => {
-                console.log("Test połączenia NIE powiódł się → Brak internetu.", error);
+            .catch(() => {
+                console.log("Test połączenia NIE powiódł się → Brak internetu.");
                 resolve(false);
             });
     });
 }
-
 
 
 
