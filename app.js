@@ -163,7 +163,7 @@ function isActuallyOnline() {
             return;
         }
 
-        fetch("https://cynamon122.github.io/todo-list-app/test-connection.txt", { cache: "no-store" })
+        fetch("https://www.gstatic.com/generate_204", { cache: "no-store" })
             .then(() => {
                 console.log(" Test połączenia powiódł się → Online!");
                 resolve(true);
