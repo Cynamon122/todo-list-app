@@ -155,7 +155,7 @@ function deleteVoiceNote(id) {
 
 function isActuallyOnline() {
     return new Promise(resolve => {
-        console.log("Sprawdzanie rzeczywistego połączenia...");
+        console.log("🔍 Sprawdzanie rzeczywistego połączenia...");
 
         if (!navigator.onLine) {
             console.log("`navigator.onLine` zwrócił false → Brak internetu.");
@@ -165,22 +165,18 @@ function isActuallyOnline() {
 
         fetch("https://cynamon122.github.io/todo-list-app/test-connection.txt?nocache=" + Date.now(), { cache: "no-store" })
             .then(response => {
-                if (response.status === 404) { 
-                    console.warn("`404 Not Found` – ale internet działa! Ignorujemy ten błąd.");
-                    resolve(true);
-                } else if (response.ok) {
+                if (response.ok) {
                     console.log("Test połączenia powiódł się → Online!");
                     resolve(true);
                 } else {
-                    console.warn("Test połączenia NIE powiódł się → Brak internetu.");
+                    console.log("`404 Not Found` - Test połączenia NIE powiódł się");
                     resolve(false);
                 }
             })
             .catch(error => {
-                console.warn("Brak internetu (`fetch` error) – to normalne w trybie offline.", error);
+                console.log("Błąd podczas testowania połączenia:", error);
                 resolve(false);
             });
-
     });
 }
 
