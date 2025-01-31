@@ -214,8 +214,6 @@ window.addEventListener('online', updateConnectionStatus);
 window.addEventListener('offline', updateConnectionStatus);
 
 
-
-
 // Główna obsługa aplikacji
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -306,12 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
-
-    // Pobranie istniejących zadań z IndexedDB
-    getTasks().then(tasks => {
-        tasks.forEach(task => displayTask(task));
-    });
 
     // Obsługa dodawania nowego zadania
     addTaskButton.addEventListener('click', () => {
@@ -478,9 +470,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-
-    // Pobranie istniejących notatek głosowych
-    getVoiceNotes().then(notes => {
-        notes.forEach(note => displayVoiceNote(note));
-    });
 });
