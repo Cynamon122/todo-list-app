@@ -173,11 +173,14 @@ function updateConnectionStatus() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+document.addEventListener('DOMContentLoaded', () => {
+    updateConnectionStatus();
 
-// Obsługa zmiany statusu połączenia
-window.addEventListener('online', updateConnectionStatus);
-window.addEventListener('offline', updateConnectionStatus);
+    // Dodaj nasłuchiwanie zmiany statusu
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+});
+
 
 // Główna obsługa aplikacji
 document.addEventListener('DOMContentLoaded', () => {
