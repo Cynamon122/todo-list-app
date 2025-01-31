@@ -18,40 +18,30 @@
             <button id="nav-voice-notes">Voice Notes</button>
         </nav>
     </header>
+
     <main>
-        <!-- Widok ekranu głównego -->
         <section id="home-view" class="view">
             <h2>Welcome to the To-Do List App</h2>
             <p>Manage your tasks and voice notes efficiently.</p>
-
             <section class="summary">
                 <p><strong>Total Tasks:</strong> <span id="task-count">0</span></p>
                 <p><strong>Total Voice Notes:</strong> <span id="voice-note-count">0</span></p>
             </section>
-            
         </section>
-        
-        <!-- Widok listy zadań -->
         <section id="tasks-view" class="view hidden">
             <h2>Tasks</h2>
             <section class="todo-list">
-                <ul id="task-list">
-                    <!-- Zadania będą tutaj dodawane dynamicznie przez JavaScript -->
-                </ul>
+                <ul id="task-list"></ul>
             </section>
             <section class="add-task">
                 <input type="text" id="task-input" placeholder="Enter a new task">
                 <button id="add-task-button">Add Task</button>
             </section>
         </section>
-        
-        <!-- Widok notatek głosowych -->
         <section id="voice-notes-view" class="view hidden">
             <h2>Voice Notes</h2>
             <section class="voice-notes">
-                <ul id="voice-note-list">
-                    <!-- Notatki głosowe będą tutaj dodawane dynamicznie przez JavaScript -->
-                </ul>
+                <ul id="voice-note-list"></ul>
             </section>
             <section class="recording-controls">
                 <button id="start-recording-button">Start Recording</button>
@@ -60,16 +50,16 @@
             </section>
         </section>
     </main>
+
     <footer>
         <p>&copy; 2024 To-Do List App</p>
     </footer>
-    
-    <!-- Skrypt aplikacji -->
-    <script src="app.js"></script>
-    
-    <!-- Rejestracja Service Workera -->
-    <script src="register-sw.js"></script>
 
+    <!-- Dodanie wskaźnika połączenia -->
+    <div id="connection-status" class="connection-status">Sprawdzanie połączenia...</div>
+
+    <script src="app.js" defer></script>
+    <script src="register-sw.js" defer></script>
 
 </body>
 </html>
