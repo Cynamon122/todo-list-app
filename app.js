@@ -161,14 +161,14 @@ function isActuallyOnline() {
         }
 
         fetch("https://www.gstatic.com/generate_204", { mode: "no-cors" })
-            .then(() => resolve(true))
-            .catch(() => resolve(false));
+            .then(() => resolve(true))  // Jeśli połączenie działa, zwraca true
+            .catch(() => resolve(false));  // Jeśli nie ma internetu, zwraca false
     });
 }
 
 function updateConnectionStatus() {
     const statusIndicator = document.getElementById('connection-status');
-    
+
     if (!statusIndicator) {
         console.warn('Element #connection-status nie został znaleziony.');
         return;
@@ -187,12 +187,11 @@ function updateConnectionStatus() {
     });
 }
 
-// Sprawdź status połączenia przy starcie
+// 🔹 Uruchom funkcję od razu po załadowaniu strony
 document.addEventListener('DOMContentLoaded', updateConnectionStatus);
-
-// Aktualizuj status po zmianie
 window.addEventListener('online', updateConnectionStatus);
 window.addEventListener('offline', updateConnectionStatus);
+
 
 
 
