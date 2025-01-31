@@ -67,7 +67,7 @@ Aplikacja jest dostępna online pod adresem: [To-Do List App na GitHub Pages](ht
 
 ## Widoki
 
-1. **Home**: Ekran powitalny z informacjami o aplikacji.
+1. **Home**: Ekran powitalny z informacjami o aplikacji z podsumowaniem ilości zdań oraz notaktek głosowych
 2. **Tasks**: Zarządzanie listą zadań.
 3. **Voice Notes**: Nagrywanie, odtwarzanie i usuwanie notatek głosowych.
 
@@ -77,6 +77,7 @@ Aplikacja jest dostępna online pod adresem: [To-Do List App na GitHub Pages](ht
   - Aplikacja posiada plik `manifest.json`, który definiuje metadane aplikacji.
 - **Natywne funkcje urządzenia**:
   - Wykorzystano mikrofon do nagrywania notatek głosowych.
+  - Powiadomienia o dodanym zadaniu
 - **Tryb offline**:
   - Wdrożono Service Worker i Cache API.
 - **Responsywność**:
