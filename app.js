@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ustawienie początkowego statusu połączenia
     updateConnectionStatus();
-ą
+
     updateSummary(); // Aktualizacja liczb zadań i notatek
     refreshTasks();
     refreshVoiceNotes();
