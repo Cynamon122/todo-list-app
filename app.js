@@ -213,13 +213,32 @@ document.addEventListener('DOMContentLoaded', updateConnectionStatus);
 window.addEventListener('online', updateConnectionStatus);
 window.addEventListener('offline', updateConnectionStatus);
 
+function requestNotificationPermission() {
+    if ('Notification' in window) {
+        if (Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                console.log("Status zgody na powiadomienia:", permission);
+            });
+        }
+    }
+}
+
+function sendNotification(taskContent) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification("Nowe zadanie dodane!", {
+            body: taskContent,
+            icon: './icon-192x192.png' 
+        });
+    }
+}
+
 
 
 // Główna obsługa aplikacji
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Ustawienie początkowego statusu połączenia
 
+    requestNotificationPermission();
     updateSummary(); // Aktualizacja liczb zadań i notatek
     refreshTasks();
     refreshVoiceNotes();
@@ -317,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addTask(taskText).then(() => {
                 refreshTasks(); // Odświeżenie listy zadań
                 taskInput.value = ''; // Wyczyszczenie pola tekstowego
+                sendNotification(taskText); // Wysyłamy powiadomienie
             }).catch(error => {
                 console.error("Błąd podczas dodawania zadania:", error);
             });
