@@ -153,33 +153,47 @@ function deleteVoiceNote(id) {
     });
 }
 
-// Funkcja do aktualizacji statusu połączenia w interfejsie użytkownika
+function isActuallyOnline() {
+    return new Promise(resolve => {
+        if (!navigator.onLine) {
+            resolve(false);
+            return;
+        }
+
+        fetch("https://www.gstatic.com/generate_204", { mode: "no-cors" })
+            .then(() => resolve(true))
+            .catch(() => resolve(false));
+    });
+}
+
 function updateConnectionStatus() {
     const statusIndicator = document.getElementById('connection-status');
     
     if (!statusIndicator) {
         console.warn('Element #connection-status nie został znaleziony.');
-        return; // Przerwij funkcję, jeśli element nie istnieje
+        return;
     }
 
-    if (navigator.onLine) {
-        statusIndicator.textContent = 'Jesteś online';
-        statusIndicator.classList.add('online');
-        statusIndicator.classList.remove('offline');
-    } else {
-        statusIndicator.textContent = 'Jesteś offline. Niektóre funkcje mogą być ograniczone.';
-        statusIndicator.classList.add('offline');
-        statusIndicator.classList.remove('online');
-    }
+    isActuallyOnline().then(isOnline => {
+        if (isOnline) {
+            statusIndicator.textContent = 'Jesteś online';
+            statusIndicator.classList.add('online');
+            statusIndicator.classList.remove('offline');
+        } else {
+            statusIndicator.textContent = 'Jesteś offline. Niektóre funkcje mogą być ograniczone.';
+            statusIndicator.classList.add('offline');
+            statusIndicator.classList.remove('online');
+        }
+    });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    updateConnectionStatus();
+// Sprawdź status połączenia przy starcie
+document.addEventListener('DOMContentLoaded', updateConnectionStatus);
 
-    // Dodaj nasłuchiwanie zmiany statusu
-    window.addEventListener('online', updateConnectionStatus);
-    window.addEventListener('offline', updateConnectionStatus);
-});
+// Aktualizuj status po zmianie
+window.addEventListener('online', updateConnectionStatus);
+window.addEventListener('offline', updateConnectionStatus);
+
 
 
 // Główna obsługa aplikacji
