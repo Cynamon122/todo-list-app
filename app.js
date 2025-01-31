@@ -227,18 +227,17 @@ function sendNotification(taskContent) {
     if ('Notification' in window && Notification.permission === 'granted') {
         new Notification("Nowe zadanie dodane!", {
             body: taskContent,
-            icon: './icon-192x192.png' 
+            icon: './icon-192x192.png' // Możesz podmienić na inną ikonę
         });
     }
 }
 
+document.addEventListener('DOMContentLoaded', requestNotificationPermission);
 
 
 // Główna obsługa aplikacji
 document.addEventListener('DOMContentLoaded', () => {
 
-
-    requestNotificationPermission();
     updateSummary(); // Aktualizacja liczb zadań i notatek
     refreshTasks();
     refreshVoiceNotes();
