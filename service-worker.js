@@ -70,14 +70,24 @@ self.addEventListener('fetch', event => {
     } else {
         // Dla innych zasobów użyj strategii Network First
         event.respondWith(
-            fetch(event.request).then(networkResponse => {
-                // Pobierz zasób z sieci i zapisz w cache
-                return caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse; // Zwróć zasób z sieci
-                });
-            }).catch(() => caches.match('/offline.html')) // Jeśli brak sieci, zwróć offline.html
+            fetch(event.request)
+                .then(networkResponse => {
+                    return caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                })
+                .catch(() => {
+                    return caches.match(event.request).then(cachedResponse => {
+                        if (cachedResponse) {
+                            return cachedResponse;
+                        } else {
+                            return caches.match('/offline.html');
+                        }
+                    });
+                })
         );
+        
     }
 });
 
