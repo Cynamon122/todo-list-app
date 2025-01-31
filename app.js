@@ -224,11 +224,16 @@ function requestNotificationPermission() {
 }
 
 function sendNotification(taskContent) {
+    console.log("Próba wysłania powiadomienia...");
+
     if ('Notification' in window && Notification.permission === 'granted') {
+        console.log("Tworzenie powiadomienia...");
         new Notification("Nowe zadanie dodane!", {
             body: taskContent,
-            icon: './icon-192x192.png' // Możesz podmienić na inną ikonę
+            icon: './icon-192x192.png'
         });
+    } else {
+        console.warn("Brak zgody na powiadomienia lub funkcja nieobsługiwana.");
     }
 }
 
