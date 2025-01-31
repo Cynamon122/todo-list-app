@@ -220,7 +220,6 @@ window.addEventListener('offline', updateConnectionStatus);
 document.addEventListener('DOMContentLoaded', () => {
 
     // Ustawienie początkowego statusu połączenia
-    updateConnectionStatus();
 
     updateSummary(); // Aktualizacja liczb zadań i notatek
     refreshTasks();
