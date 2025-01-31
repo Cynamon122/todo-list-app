@@ -168,7 +168,7 @@ function isActuallyOnline() {
                 console.log("Test połączenia powiódł się → Online!");
                 resolve(true);
             })
-            .catch(() => {
+            .catch(error => {
                 console.log("Test połączenia NIE powiódł się → Brak internetu.");
                 resolve(false);
             });
