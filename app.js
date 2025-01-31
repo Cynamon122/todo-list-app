@@ -155,31 +155,44 @@ function deleteVoiceNote(id) {
 
 function isActuallyOnline() {
     return new Promise(resolve => {
+        console.log("Sprawdzanie rzeczywistego połączenia...");
+        
         if (!navigator.onLine) {
+            console.log("navigator.onLine === false → Brak internetu.");
             resolve(false);
             return;
         }
 
         fetch("https://www.gstatic.com/generate_204", { mode: "no-cors" })
-            .then(() => resolve(true))  // Jeśli połączenie działa, zwraca true
-            .catch(() => resolve(false));  // Jeśli nie ma internetu, zwraca false
+            .then(() => {
+                console.log("Test połączenia powiódł się → Online!");
+                resolve(true);
+            })
+            .catch(() => {
+                console.log("Test połączenia NIE powiódł się → Brak internetu.");
+                resolve(false);
+            });
     });
 }
 
 function updateConnectionStatus() {
+    console.log("Aktualizacja statusu połączenia...");
+
     const statusIndicator = document.getElementById('connection-status');
 
     if (!statusIndicator) {
-        console.warn('Element #connection-status nie został znaleziony.');
+        console.warn('⚠️ Element #connection-status nie został znaleziony.');
         return;
     }
 
     isActuallyOnline().then(isOnline => {
         if (isOnline) {
+            console.log(" Połączenie online!");
             statusIndicator.textContent = 'Jesteś online';
             statusIndicator.classList.add('online');
             statusIndicator.classList.remove('offline');
         } else {
+            console.log(" Brak internetu!");
             statusIndicator.textContent = 'Jesteś offline. Niektóre funkcje mogą być ograniczone.';
             statusIndicator.classList.add('offline');
             statusIndicator.classList.remove('online');
