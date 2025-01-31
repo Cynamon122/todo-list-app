@@ -155,7 +155,7 @@ function deleteVoiceNote(id) {
 
 function isActuallyOnline() {
     return new Promise(resolve => {
-        console.log("🔍 Sprawdzanie rzeczywistego połączenia...");
+        console.log("Sprawdzanie rzeczywistego połączenia...");
 
         if (!navigator.onLine) {
             console.log("`navigator.onLine` zwrócił false → Brak internetu.");
@@ -169,14 +169,15 @@ function isActuallyOnline() {
                     console.log("Test połączenia powiódł się → Online!");
                     resolve(true);
                 } else {
-                    console.log("Test połączenia NIE powiódł się → Brak internetu.");
+                    console.warn("Test połączenia NIE powiódł się → Brak internetu.");
                     resolve(false);
                 }
             })
-            .catch(error => {
-                console.log("Błąd podczas testowania połączenia:", error);
+            .catch(() => {
+                console.warn("Brak internetu (`fetch` error) – to normalne w trybie offline.");
                 resolve(false);
             });
+
     });
 }
 

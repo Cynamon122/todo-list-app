@@ -70,26 +70,29 @@ self.addEventListener('fetch', event => {
     } else {
         // Dla innych zasobów użyj strategii Network First
         event.respondWith(
-            fetch(event.request)
-                .then(networkResponse => {
-                    return caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
-                    });
-                })
-                .catch(() => {
-                    return caches.match(event.request).then(cachedResponse => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        } else {
-                            return caches.match('/offline.html');
-                        }
-                    });
-                })
+            caches.open(CACHE_NAME).then(cache => {
+                return cache.match(event.request).then(cachedResponse => {
+                    return cachedResponse || fetch(event.request)
+                        .then(networkResponse => {
+                            cache.put(event.request, networkResponse.clone());
+                            return networkResponse;
+                        })
+                        .catch(() => handleOfflineResponse(event)); // 🔹 Poprawiona obsługa offline
+                });
+            })
         );
-        
     }
 });
+
+function handleOfflineResponse(event) {
+    if (event.request.destination === 'document') {
+        return caches.match('/offline.html').then(response => {
+            return response || new Response("Offline page not available", { status: 503, statusText: "Service Unavailable" });
+        });
+    } else {
+        return new Response("Resource not found", { status: 404, statusText: "Not Found" });
+    }
+}
 
 // Obsługa komunikatów między Service Workerem a aplikacją
 self.addEventListener('message', event => {
