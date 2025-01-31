@@ -155,7 +155,7 @@ function deleteVoiceNote(id) {
 
 function isActuallyOnline() {
     return new Promise(resolve => {
-        console.log("Sprawdzanie rzeczywistego połączenia...");
+        console.log("🔍 Sprawdzanie rzeczywistego połączenia...");
 
         if (!navigator.onLine) {
             console.log("`navigator.onLine` zwrócił false → Brak internetu.");
@@ -163,17 +163,23 @@ function isActuallyOnline() {
             return;
         }
 
-        fetch("https://www.gstatic.com/generate_204", { mode: "no-cors" }) 
-            .then(() => {
-                console.log("Test połączenia powiódł się → Online!");
-                resolve(true);
+        fetch("https://cynamon122.github.io/todo-list-app/test-connection.txt?nocache=" + Date.now(), { cache: "no-store" })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Test połączenia powiódł się → Online!");
+                    resolve(true);
+                } else {
+                    console.log("Test połączenia NIE powiódł się → Brak internetu.");
+                    resolve(false);
+                }
             })
             .catch(error => {
-                console.log("Test połączenia NIE powiódł się → Brak internetu.");
+                console.log("Błąd podczas testowania połączenia:", error);
                 resolve(false);
             });
     });
 }
+
 
 
 
