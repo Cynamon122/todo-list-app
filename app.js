@@ -239,6 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tasksView.classList.add('hidden');
         voiceNotesView.classList.add('hidden');
         view.classList.remove('hidden');
+        if (view === homeView) {
+            updateSummary();
+        }
+    
     }
 
     // Obsługa kliknięć w elementy nawigacji
