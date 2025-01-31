@@ -157,6 +157,11 @@ function deleteVoiceNote(id) {
 function updateConnectionStatus() {
     const statusIndicator = document.getElementById('connection-status');
     
+    if (!statusIndicator) {
+        console.warn('Element #connection-status nie został znaleziony.');
+        return; // Przerwij funkcję, jeśli element nie istnieje
+    }
+
     if (navigator.onLine) {
         statusIndicator.textContent = 'Jesteś online';
         statusIndicator.classList.add('online');
