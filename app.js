@@ -158,22 +158,23 @@ function isActuallyOnline() {
         console.log("Sprawdzanie rzeczywistego połączenia...");
 
         if (!navigator.onLine) {
-            console.log("navigator.onLine === false → Brak internetu.");
+            console.log("`navigator.onLine` zwrócił false → Brak internetu.");
             resolve(false);
             return;
         }
 
-        fetch("https://www.gstatic.com/generate_204", { cache: "no-store" })
+        fetch("https://www.gstatic.com/generate_204", { mode: "no-cors" }) 
             .then(() => {
-                console.log(" Test połączenia powiódł się → Online!");
+                console.log("Test połączenia powiódł się → Online!");
                 resolve(true);
             })
             .catch(() => {
-                console.log(" Test połączenia NIE powiódł się → Brak internetu.");
+                console.log("Test połączenia NIE powiódł się → Brak internetu.");
                 resolve(false);
             });
     });
 }
+
 
 
 function updateConnectionStatus() {
