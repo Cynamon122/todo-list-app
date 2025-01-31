@@ -212,15 +212,10 @@ window.addEventListener('offline', updateConnectionStatus);
 
 // Główna obsługa aplikacji
 document.addEventListener('DOMContentLoaded', () => {
-    // Tworzenie wskaźnika statusu połączenia
-    const statusIndicator = document.createElement('div');
-    statusIndicator.id = 'connection-status';
-    statusIndicator.classList.add('connection-status');
-    document.body.appendChild(statusIndicator);
 
     // Ustawienie początkowego statusu połączenia
     updateConnectionStatus();
-
+ą
     updateSummary(); // Aktualizacja liczb zadań i notatek
     refreshTasks();
     refreshVoiceNotes();
